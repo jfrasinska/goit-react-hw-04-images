@@ -24,28 +24,31 @@ const App = () => {
       .then(response => response.json())
       .then(data => {
         setImages(prevImages => [...prevImages, ...data.hits]);
-        setPage(prevPage => prevPage + 1);
       })
       .finally(() => {
         setIsLoading(false);
       });
   }, [query, page]);
 
-  const handleSearchSubmit = newQuery => {
+  const handleSearchSubmit = useCallback(newQuery => {
     setQuery(newQuery);
     setImages([]);
     setPage(1);
-  };
+  }, []);
 
-  const handleImageClick = newLargeImageURL => {
+  const handleImageClick = useCallback(newLargeImageURL => {
     setLargeImageURL(newLargeImageURL);
     setShowModal(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setLargeImageURL('');
-  };
+  }, []);
+
+  const handleLoadMore = useCallback(() => {
+    setPage(prevPage => prevPage + 1);
+  }, []);
 
   useEffect(() => {
     if (!query) return;
@@ -58,7 +61,7 @@ const App = () => {
       <Searchbar onSubmit={handleSearchSubmit} />
       <ImageGallery images={images} onImageClick={handleImageClick} />
       {isLoading && <Loader />}
-      {images.length > 0 && !isLoading && <Button onClick={fetchImages} />}
+      {images.length > 0 && !isLoading && <Button onClick={handleLoadMore} />}
       {showModal && (
         <Modal onClose={handleCloseModal}>
           <img src={largeImageURL} alt="" />
